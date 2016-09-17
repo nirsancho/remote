@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css"/>
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+    <style>
+
+    </style>
+</head>
+<body>
+<div data-role="page">
+    <div data-role="header">
+        <form action="#">
+            <a href="#" id="change_language"
+               class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Lang</a>
+<a href="#" id="send_esc"
+               class="ui-title">esc</a>
+
+            <a href="#" id="change_window"
+               class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-grid">Window</a>
+        </form>
+    </div>
+    <div role="main" class="ui-content">
+        <input type="text" id="key_listener" autocorrect="off" autocapitalize="off" style="width:100%"/>
+        <div id="mouse"
+             style="float: left; width:80%; height: 300px; overflow: scroll;  -webkit-overflow-scrolling: touch;">
+            <div id="mouse_pad"
+                 style="background: url(http://www.clker.com/cliparts/d/3/2/b/1194989367717724366pattern-dots-square-grid-04.svg.med.png); width:1280px; height:720px"></div>
+        </div>
+
+
+        <div id="mouse_scroll" style="width:15%; height: 300px; overflow: scroll;  -webkit-overflow-scrolling: touch;">
+            <div id="mouse_pad_scroll"
+                 style="background: url(https://images.blogthings.com/thecolorfulpatterntest/pattern-1.png); width:100px; height:90000px"></div>
+        </div>
+
+        <code id="log"></code>
+    </div>
+    <!--<div data-role="footer">-->
+        <!--<h4>Page Footer</h4>-->
+    <!--</div>-->
+</div>
+
+<script>
+//http://previews.123rf.com/images/zechal/zechal1111/zechal111100072/11393136-Metal-grill-mesh-pattern-of-loud-speakers-detail--Stock-Photo.jpg
+//http://vector.me/files/images/2/3/233855/metal_grill.jpg
+    function get_mouse_pos() {
+        return ({
+            top: 1.0-$('#mouse').scrollTop()/($('#mouse_pad').height()-$('#mouse').height()),
+            left: 1.0-$('#mouse').scrollLeft()/($('#mouse_pad').width()-$('#mouse').width())
+        });
+    }
+
+    function get_scroll_pos() {
+        return ({
+            top: 1.0-$('#mouse_scroll').scrollTop()/($('#mouse_pad_scroll').height()-$('#mouse_scroll').height()),
+            left: 1.0-$('#mouse_scroll').scrollLeft()/($('#mouse_pad_scroll').width()-$('#mouse_scroll').width())
+        });
+    }
+
+    function center_scroller() {
+        ignore_scroll_event = true;
+        $('#mouse_scroll').scrollTop($('#mouse_pad_scroll').height()/2)
+        $('#mouse_scroll').scrollLeft($('#mouse_pad_scroll').width()/2)
+        ignore_scroll_event = false;
+      }
+    function log(a, clear) {
+        clear = clear || false;
+        if (!(typeof a == "string")) {
+            a = JSON.stringify(a);
+        }
+        var $log = $("#log");
+        if (clear) {
+            $log.empty();
+        }
+        $log.append("<p>"+a+"</p>");
+    }
+
+    function init() {
+        var list_of_elements = ['#mouse', '#mouse_scroll', '#mouse_scroll', '#mouse', '#key_listener', "#change_language",
+                                "#change_window"];
+
+
+        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        var last_known_scroll_position = 0.5;
+        var ignore_scroll_event = false;
+
+        $('#mouse').scrollTop(($('#mouse_pad').height()-$('#mouse').height())/2)
+        $('#mouse').scrollLeft(($('#mouse_pad').width()-$('#mouse').width())/2)
+        center_scroller();
+        socket.on('disconnect', function() { log('disconnect', true); });
+        socket.on('reconnect', function() { log('reconnect', true); });
+
+        socket.on('connect', function() {
+            $.map(list_of_elements, function (o) { $(o).off(); });
+
+             log('connect', true);
+
+            $('#mouse').on('scroll', function(e) {
+                console.log(e);
+                socket.emit('mouse', get_mouse_pos());
+            })
+
+            $('#mouse_scroll').on('scroll', function(e) {
+                if (ignore_scroll_event) {
+                    return;
+                }
+                console.log(e);
+                var pos = get_scroll_pos();
+                var amount = (last_known_scroll_position - pos['top']) * $('#mouse_pad_scroll').height()
+                if (Math.abs(amount) < 10) { return; }
+                last_known_scroll_position =  pos['top']
+                pos = {scroll:  amount / 10 };
+                socket.emit('mouse', pos);
+                //center_scroller();
+            })
+
+            $('#mouse_scroll').on('taphold', function(e) {
+                console.log(e);
+                var pos = get_mouse_pos();
+                pos['button'] = 3;
+                socket.emit('mouse', pos);
+            });
+
+            $('#mouse').on('tap', function(e) {
+                console.log(e);
+                var pos = get_mouse_pos();
+                pos['button'] = 1;
+                socket.emit('mouse', pos);
+            })
+
+            $('#mouse').on('taphold', function(e) {
+                console.log(e);
+                var pos = get_mouse_pos();
+                pos['button'] = 2;
+                socket.emit('mouse', pos);
+            });
+
+            var event_counter = 0;
+            var inverse_mapping = {"פ":80,"ם":79,"ן":73,"ו":85,"ט":89,"א":84,"ר":82,"ק":69,"ף":186,"ך":76,"ל":75,"ח":74,"י":72,"ע":71,"כ":70,"ג":68,"ד":83,"ש":65,"ץ":190,"ת":188,"צ":77,"מ":78,"נ":66,"ה":86,"ב":67,"ס":88,"ז":90};
+
+            $('#key_listener').on('keyup', function(e) {
+                console.log(e);
+
+                var t = $('#key_listener').val()
+                $('#key_listener').val('')
+                var k = e.keyCode || e.code || e.which || e.key ;
+                /*if (t != "") {
+                    $("#key_log").append(t);
+                } else if (k == 13) {
+                    $("#key_log").append("<br>");
+                }*/
+
+
+                if (t != "") {
+                    k = t;
+                }
+
+                var m = {key: k, counter: event_counter};
+                event_counter++;
+
+                //if (k == 0) {
+                //    k = t;
+                //    m = {letter: k};
+                //}
+
+                socket.emit('keypress', m);
+                e.preventDefault();
+
+                //socket.emit('debug', {keyCode: e.keyCode, code: e.code, which: e.which, key: e.key});
+
+             });
+
+             $("#change_language").on('click', function(e) {
+                socket.emit('change_language', {});
+                e.preventDefault();
+                $('#key_listener').focus();
+             });
+
+              $("#change_window").on('click', function(e) {
+                socket.emit('change_window', {});
+                e.preventDefault();
+                $('#key_listener').focus();
+             });
+$("#send_esc").on('click', function(e) {
+                socket.emit('keypress', {key: 'Escape'});
+                e.preventDefault();
+             });
+
+        });
+    }
+    $(init);
+
+
+
+
+
+</script>
+</body>
+</html>
+

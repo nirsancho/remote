@@ -1,0 +1,63 @@
+<form action="#">
+    <input type="text" id="key_listener" autocorrect="off" autocapitalize="off"/>
+    <button id="change_language">Change Language</button>
+</form>
+<code id="key_log"></code>
+<div id="log">3)</div>
+<div id="mouse" style="width:200px; height: 180px; overflow: scroll;  -webkit-overflow-scrolling: touch;">
+<div id="mouse_pad" style="background: url(http://vector.me/files/images/2/3/233855/metal_grill.jpg); width:1980px; height:1090px"></div></div>
+
+<script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+function init() {
+    var event_counter = 0;
+    var inverse_mapping = {"פ":80,"ם":79,"ן":73,"ו":85,"ט":89,"א":84,"ר":82,"ק":69,"ף":186,"ך":76,"ל":75,"ח":74,"י":72,"ע":71,"כ":70,"ג":68,"ד":83,"ש":65,"ץ":190,"ת":188,"צ":77,"מ":78,"נ":66,"ה":86,"ב":67,"ס":88,"ז":90};
+    var socket = io.connect('http://' + document.domain + ':' + location.port);
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+        $('#key_listener').on('keyup', function(e) {
+            console.log(e);
+
+            var t = $('#key_listener').val()
+            $('#key_listener').val('')
+            var k = e.keyCode || e.code || e.which || e.key ;
+            if (t != "") {
+                $("#key_log").append(t);
+            } else if (k == 13) {
+                $("#key_log").append("<br>");
+            }
+
+            if (inverse_mapping.hasOwnProperty(t)) {
+                k = inverse_mapping[t];
+            }
+            var m = {key: k, counter: event_counter};
+            event_counter++;
+
+            //if (k == 0) {
+            //    k = t;
+            //    m = {letter: k};
+            //}
+            $('#log').html('');
+            $('#log').append('<span> ------ <br></span>')
+            $('#log').append('<span> keyCode: ' + e.keyCode + '<br></span>')
+            $('#log').append('<span> charCode: ' + e.charCode + '<br></span>')
+            $('#log').append('<span> code: ' + e.code + '<br></span>')
+            $('#log').append('<span> which: ' + e.which + '<br></span>')
+            $('#log').append('<span> key: ' + e.key + '<br></span>')
+            $('#log').append('<span> char: ' + e.char + '<br></span>')
+            socket.emit('keypress', m);
+            e.preventDefault();
+
+         });
+
+         $("#change_language").on('click', function(e) {
+            socket.emit('change_language', {});
+            e.preventDefault();
+         });
+    });
+}
+$(init);
+
+</script>
+
