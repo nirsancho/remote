@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Remote Control
+Comment=My Remote Control
+Exec=python /home/nir/Downloads/remote_control/remote_control_main.py
+Icon=/home/nir/Downloads/remote_control/icon2.png
+Terminal=true
+Categories=Application;

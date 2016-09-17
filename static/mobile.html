@@ -7,7 +7,6 @@
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
     <style>
-
     </style>
 </head>
 <body>
@@ -92,9 +91,12 @@
         $('#mouse').scrollLeft(($('#mouse_pad').width()-$('#mouse').width())/2)
         center_scroller();
         socket.on('disconnect', function() { log('disconnect', true); });
-        socket.on('reconnect', function() { log('reconnect', true); });
+//        socket.on('reconnect', function() { log('reconnect', true); });
 
-        socket.on('connect', function() {
+
+
+	//socket.on('connect',
+        var on_connect = (function() {
             $.map(list_of_elements, function (o) { $(o).off(); });
 
              log('connect', true);
@@ -174,6 +176,9 @@
 
              });
 
+	     //socket.on('reconnect', connect);
+
+
              $("#change_language").on('click', function(e) {
                 socket.emit('change_language', {});
                 e.preventDefault();
@@ -185,13 +190,19 @@
                 e.preventDefault();
                 $('#key_listener').focus();
              });
-$("#send_esc").on('click', function(e) {
+
+             $("#send_esc").on('click', function(e) {
                 socket.emit('keypress', {key: 'Escape'});
                 e.preventDefault();
              });
 
-        });
-    }
+        }); // end of on_connect
+	
+	socket.on('connect', on_connect);
+	socket.on('reconnect', on_connect);
+
+    } // end of init
+
     $(init);
 
 
