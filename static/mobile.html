@@ -7,27 +7,24 @@
     <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
     <script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/socket.io/1.3.6/socket.io.min.js"></script>
     <style>
+    div { scroll: hidden ;}
+    .ui-content {padding: 0;}
+
+
+
+
+
+
     </style>
 </head>
 <body>
 <div data-role="page">
-    <div data-role="header">
-        <form action="#">
-            <a href="#" id="change_language"
-               class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Lang</a>
-<a href="#" id="send_esc"
-               class="ui-title">esc</a>
-
-            <a href="#" id="change_window"
-               class="ui-btn-right ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-grid">Window</a>
-        </form>
-    </div>
     <div role="main" class="ui-content">
         <input type="text" id="key_listener" autocorrect="off" autocapitalize="off" style="width:100%"/>
         <div id="mouse"
-             style="float: left; width:80%; height: 300px; overflow: scroll;  -webkit-overflow-scrolling: touch;">
+             style="float: left; width:85%; height: 300px; overflow: scroll;  -webkit-overflow-scrolling: touch;">
             <div id="mouse_pad"
-                 style="background: url(http://www.clker.com/cliparts/d/3/2/b/1194989367717724366pattern-dots-square-grid-04.svg.med.png); width:1280px; height:720px"></div>
+                 style="background: url(http://previews.123rf.com/images/zhendosina/zhendosina1501/zhendosina150100065/36091375-Vector-seamless-pattern-of-hexagons-similar-to-a-honeycomb-Infinite-ornament-pastel-colours-Warm-and-Stock-Vector.jpg); background-size:20%; width:1280px; height:720px"></div>
         </div>
 
 
@@ -37,15 +34,27 @@
         </div>
 
         <code id="log"></code>
+        <div>
+            <fieldset class="ui-grid-b">
+                <div class="ui-block-a"><input type="button" id="send_esc" value="ESC" data-icon="back" data-mini="true"></div>
+                <div class="ui-block-b"><input type="button" id="change_window" value="Window" data-icon="grid" data-mini="true"></div>
+                <div class="ui-block-c"><input type="button" id="change_language" value="Lang" data-icon="recycle" data-mini="true"></div>
+            </fieldset>
+        </div><!-- /footer -->
+
     </div>
+
+
     <!--<div data-role="footer">-->
-        <!--<h4>Page Footer</h4>-->
+    <!--<h4>Page Footer</h4>-->
     <!--</div>-->
 </div>
 
 <script>
 //http://previews.123rf.com/images/zechal/zechal1111/zechal111100072/11393136-Metal-grill-mesh-pattern-of-loud-speakers-detail--Stock-Photo.jpg
 //http://vector.me/files/images/2/3/233855/metal_grill.jpg
+//http://www.clker.com/cliparts/d/3/2/b/1194989367717724366pattern-dots-square-grid-04.svg.med.png
+//http://orig15.deviantart.net/79b8/f/2013/110/d/b/hex_grid_green_by_metatality-d62eip6.png
     function get_mouse_pos() {
         return ({
             top: 1.0-$('#mouse').scrollTop()/($('#mouse_pad').height()-$('#mouse').height()),
@@ -192,7 +201,7 @@
              });
 
              $("#send_esc").on('click', function(e) {
-                socket.emit('keypress', {key: 'Escape'});
+                socket.emit('keypress', {key: 27});
                 e.preventDefault();
              });
 
@@ -204,6 +213,12 @@
     } // end of init
 
     $(init);
+
+
+
+
+
+
 
 
 

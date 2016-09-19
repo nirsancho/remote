@@ -46,11 +46,11 @@ def handle_change_window(message):
 
 @socketio.on('keypress')
 def handle_message(message):
-    # print message
+    print message
     hebrew_letters = u'קראטוןםפשדגכעיחלךףזסבהנמצתץ'
     english_letters = u'ertyuiopasdfghjkl;zxcvbnm,.'
     assert len(hebrew_letters) == len(english_letters)
-    key_mapping = dict(zip(hebrew_letters, english_letters), **{13: k.return_key, 8: k.backspace_key, 32: k.space})
+    key_mapping = dict(zip(hebrew_letters, english_letters), **{13: k.return_key, 8: k.backspace_key, 32: k.space, 27: k.escape_key })
     try:
         if 'key' in message:
             key = message['key']
