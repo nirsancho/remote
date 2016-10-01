@@ -10,6 +10,12 @@
         div { scroll: hidden ;}
         .ui-content {padding: 0;}
 
+        div.video_control > a {
+            margin: 5px;
+            padding: 5px;
+            float: left;
+        }
+
 
     </style>
 </head>
@@ -25,7 +31,7 @@
                 <div class="ui-block-c"><input type="button" id="change_language" value="Lang" data-icon="recycle"
                                                data-mini="true"></div>
             </fieldset>
-        </div><!-- /footer -->
+        </div>
         <input type="text" id="key_listener" autocorrect="off" autocapitalize="off" style="width:100%"/>
         <div id="mouse"
              style="float: left; width:85%; height: 300px; overflow: scroll;  -webkit-overflow-scrolling: touch;">
@@ -40,7 +46,23 @@
         </div>
 
         <code id="log"></code>
-
+        <div class="video_control">
+            <a href="#" class="ui-btn ui-shadow ui-corner-all ui-icon-carat-r ui-btn-icon-notext"
+               type="button" id="youtube_toggle_play" value=" " data-icon="carat-r"
+               data-mini="true" onclick="send_key(32, '')"></a>
+            <a href="#" class="ui-btn ui-shadow ui-corner-all ui-icon-eye ui-btn-icon-notext"
+               type="button" id="youtube_fullscreen" value=" " data-icon="eye"
+               data-mini="true" onclick="send_key('f', '');"></a>
+            <a href="#" class="ui-btn ui-shadow ui-corner-all ui-icon-forbidden ui-btn-icon-notext"
+               type="button" id="change_mute" value=" " data-icon="forbidden"
+               data-mini="true" onclick="send_key('M', 'alt');" style="margin-left: 40px"></a>
+            <a href="#" class="ui-btn ui-shadow ui-corner-all ui-icon-minus ui-btn-icon-notext"
+               type="button" id="change_vol_down" value=" " data-icon="minus"
+               data-mini="true" onclick="send_key('D', 'alt');"></a>
+            <a href="#" class="ui-btn ui-shadow ui-corner-all ui-icon-plus ui-btn-icon-notext"
+               type="button" id="change_vol_up" value=" " data-icon="plus"
+               data-mini="true" onclick="send_key('U', 'alt');"></a>
+        </div>
     </div>
 
 
@@ -91,7 +113,7 @@
                                 "#change_window"];
 
 
-        var socket = io.connect('http://' + document.domain + ':' + location.port);
+        window.socket = io.connect('http://' + document.domain + ':' + location.port);
         var last_known_scroll_position = 0.5;
         var ignore_scroll_event = false;
 
@@ -211,7 +233,14 @@
 
     } // end of init
 
+    function send_key(key, modifier) {
+        socket.emit('keypress', {key: key, modifier: modifier});
+    }
+
     $(init);
+
+
+
 
 
 

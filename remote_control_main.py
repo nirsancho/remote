@@ -51,6 +51,7 @@ def handle_message(message):
     english_letters = u'ertyuiopasdfghjkl;zxcvbnm,.'
     assert len(hebrew_letters) == len(english_letters)
     key_mapping = dict(zip(hebrew_letters, english_letters), **{13: k.return_key, 8: k.backspace_key, 32: k.space, 27: k.escape_key })
+    mod_mapping = dict(alt=k.alt_l_key, ctrl=k.control_l_key)
     try:
         if 'key' in message:
             key = message['key']
@@ -65,8 +66,14 @@ def handle_message(message):
             elif key in key_mapping:
                 key = key_mapping[key]
 
+            mod = []
+            if 'modifier' in message and message['modifier'] in mod_mapping:
+                mod = [mod_mapping[message['modifier']]]
+
             if isinstance(key, int):
                 k.tap_key(key)
+            elif isinstance(key, basestring):
+                k.press_keys(mod + [key])
             else:
                 for kk in key:
                     k.tap_key(kk)
